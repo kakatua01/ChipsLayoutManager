@@ -173,8 +173,8 @@ abstract class ScrollingController implements IScrollingController {
             return 0;
         }
 
-        int firstVisiblePos = lm.findFirstVisibleItemPosition();
-        int lastVisiblePos = lm.findLastVisibleItemPosition();
+        int firstVisiblePos = lm.findFirstCompletelyVisibleItemPosition();
+        int lastVisiblePos = lm.findLastCompletelyVisibleItemPosition();
         final int itemsBefore = Math.max(0, firstVisiblePos);
 
         if (!lm.isSmoothScrollbarEnabled()) {
@@ -196,8 +196,8 @@ abstract class ScrollingController implements IScrollingController {
             return 0;
         }
 
-        int firstVisiblePos = lm.findFirstVisibleItemPosition();
-        int lastVisiblePos = lm.findLastVisibleItemPosition();
+        int firstVisiblePos = lm.findFirstCompletelyVisibleItemPosition();
+        int lastVisiblePos = lm.findLastCompletelyVisibleItemPosition();
 
         if (!lm.isSmoothScrollbarEnabled()) {
             return Math.abs(lastVisiblePos - firstVisiblePos) + 1;
@@ -215,8 +215,8 @@ abstract class ScrollingController implements IScrollingController {
             return state.getItemCount();
         }
 
-        int firstVisiblePos = lm.findFirstVisibleItemPosition();
-        int lastVisiblePos = lm.findLastVisibleItemPosition();
+        int firstVisiblePos = lm.findFirstCompletelyVisibleItemPosition();
+        int lastVisiblePos = lm.findLastCompletelyVisibleItemPosition();
 
         // smooth scrollbar enabled. try to estimate better.
         final int laidOutRange = Math.abs(firstVisiblePos - lastVisiblePos) + 1;
