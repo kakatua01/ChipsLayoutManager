@@ -9,46 +9,48 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RestrictTo;
 import android.support.annotation.VisibleForTesting;
 import android.support.v4.view.ViewCompat;
+import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseArray;
 import android.view.View;
 
 import com.beloo.widget.chipslayoutmanager.anchor.AnchorViewState;
 import com.beloo.widget.chipslayoutmanager.anchor.IAnchorFactory;
-import com.beloo.widget.chipslayoutmanager.layouter.ColumnsStateFactory;
-import com.beloo.widget.chipslayoutmanager.layouter.ICanvas;
-import com.beloo.widget.chipslayoutmanager.layouter.IMeasureSupporter;
-import com.beloo.widget.chipslayoutmanager.layouter.IStateFactory;
-import com.beloo.widget.chipslayoutmanager.layouter.MeasureSupporter;
-import com.beloo.widget.chipslayoutmanager.layouter.RowsStateFactory;
-import com.beloo.widget.chipslayoutmanager.layouter.breaker.EmptyRowBreaker;
-import com.beloo.widget.chipslayoutmanager.layouter.breaker.IRowBreaker;
 import com.beloo.widget.chipslayoutmanager.cache.IViewCacheStorage;
 import com.beloo.widget.chipslayoutmanager.cache.ViewCacheFactory;
 import com.beloo.widget.chipslayoutmanager.gravity.CenterChildGravity;
 import com.beloo.widget.chipslayoutmanager.gravity.CustomGravityResolver;
 import com.beloo.widget.chipslayoutmanager.gravity.IChildGravityResolver;
-import com.beloo.widget.chipslayoutmanager.layouter.LayouterFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.AbstractPositionIterator;
+import com.beloo.widget.chipslayoutmanager.layouter.ColumnsStateFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.ICanvas;
 import com.beloo.widget.chipslayoutmanager.layouter.ILayouter;
+import com.beloo.widget.chipslayoutmanager.layouter.IMeasureSupporter;
+import com.beloo.widget.chipslayoutmanager.layouter.IStateFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.LayouterFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.MeasureSupporter;
+import com.beloo.widget.chipslayoutmanager.layouter.RowsStateFactory;
+import com.beloo.widget.chipslayoutmanager.layouter.breaker.EmptyRowBreaker;
+import com.beloo.widget.chipslayoutmanager.layouter.breaker.IRowBreaker;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.AbstractCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.ICriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.criteria.InfiniteCriteriaFactory;
 import com.beloo.widget.chipslayoutmanager.layouter.placer.PlacerFactory;
-import com.beloo.widget.chipslayoutmanager.util.log.IFillLogger;
-import com.beloo.widget.chipslayoutmanager.util.log.LoggerFactory;
 import com.beloo.widget.chipslayoutmanager.util.AssertionUtils;
 import com.beloo.widget.chipslayoutmanager.util.LayoutManagerUtil;
+import com.beloo.widget.chipslayoutmanager.util.log.IFillLogger;
 import com.beloo.widget.chipslayoutmanager.util.log.Log;
 import com.beloo.widget.chipslayoutmanager.util.log.LogSwitcherFactory;
+import com.beloo.widget.chipslayoutmanager.util.log.LoggerFactory;
 import com.beloo.widget.chipslayoutmanager.util.testing.EmptySpy;
 import com.beloo.widget.chipslayoutmanager.util.testing.ISpy;
 
 import java.util.Locale;
 
+import eu.davidea.flexibleadapter.common.IFlexibleLayoutManager;
+
 public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IChipsLayoutManagerContract,
-        IStateHolder,
-        ScrollingController.IScrollerListener {
+        IStateHolder, ScrollingController.IScrollerListener, IFlexibleLayoutManager {
     ///////////////////////////////////////////////////////////////////////////
     // orientation types
     ///////////////////////////////////////////////////////////////////////////
@@ -495,6 +497,27 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     @Override
     public boolean supportsPredictiveItemAnimations() {
         return true;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // FlexibleAdapter support
+    ///////////////////////////////////////////////////////////////////////////
+
+    @Override
+    public int getOrientation() {
+        switch (layoutOrientation()) {
+            case VERTICAL:
+                return OrientationHelper.VERTICAL;
+            case HORIZONTAL:
+                return OrientationHelper.HORIZONTAL;
+            default:
+                throw new IllegalStateException("Invalid layoutOrientation!");
+        }
+    }
+
+    @Override
+    public int getSpanCount() {
+        return maxViewsInRow == null ? INT_ROW_SIZE_APPROXIMATELY_FOR_CACHE : maxViewsInRow;
     }
 
     ///////////////////////////////////////////////////////////////////////////
