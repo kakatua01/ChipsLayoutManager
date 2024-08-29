@@ -189,7 +189,6 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
     private boolean isAfterPreLayout;
 
     @SuppressWarnings("WeakerAccess")
-    @VisibleForTesting
     ChipsLayoutManager(Context context) {
         @DeviceOrientation
         int orientation = context.getResources().getConfiguration().orientation;
@@ -378,7 +377,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
             return this;
         }
 
-        /** @param breaker override to determine whether ChipsLayoutManager should breaks row due to position of view. */
+        /** @param breaker override to determine whether ChipsLayoutManager should breaks row due to position of view.
+         * Notice that if you changed gravity resolver or row breaker conditions in runtime - it won't affect already drown items and cached item positions.
+         * You have to call {@link android.support.v7.widget.RecyclerView.Adapter#notifyItemChanged(int)} otherwise layout won't be predictable. */
         @SuppressWarnings("unused")
         public Builder setRowBreaker(@NonNull IRowBreaker breaker) {
             AssertionUtils.assertNotNull(breaker, "breaker couldn't be null");
@@ -742,6 +743,9 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void detachAndScrapAttachedViews(RecyclerView.Recycler recycler) {
         super.detachAndScrapAttachedViews(recycler);
@@ -1111,6 +1115,7 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
      * {@inheritDoc}
      */
     @Override
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public void smoothScrollToPosition(RecyclerView recyclerView, RecyclerView.State state, final int position) {
         if (position >= getItemCount() || position < 0) {
             Log.e("span layout manager", "Cannot scroll to " + position + ", item count " + getItemCount());
@@ -1144,15 +1149,18 @@ public class ChipsLayoutManager extends RecyclerView.LayoutManager implements IC
         return scrollingController.scrollHorizontallyBy(dx, recycler, state);
     }
 
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public VerticalScrollingController verticalScrollingController() {
         return new VerticalScrollingController(this, stateFactory, this);
     }
 
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public HorizontalScrollingController horizontalScrollingController() {
         return new HorizontalScrollingController(this, stateFactory, this);
     }
 
     @Override
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public void onScrolled(IScrollingController scrollingController, RecyclerView.Recycler recycler, RecyclerView.State state) {
 
         performNormalizationIfNeeded();
